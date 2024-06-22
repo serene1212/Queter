@@ -20,6 +20,6 @@ class UserRegisterForm(forms.Form):
 
     username = forms.CharField(max_length=255)
     email = forms.EmailField()
-    password1 = forms.CharField(max_length=255)
-    password2 = forms.CharField(max_length=255)
+    password1 = forms.CharField(max_length=255, label='Password')
+    password2 = forms.CharField(max_length=255, label='Password confirmation')
 
