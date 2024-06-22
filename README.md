@@ -6,7 +6,7 @@
 
 Queter is a minimalistic Twitter clone inspired by the Quera website. It's built using Python and JavaScript, and managed with pip.
 
-[Github Page](https://github.com/QueraTeam)
+[Quera Team](https://github.com/QueraTeam)
 
 ## Features
 
