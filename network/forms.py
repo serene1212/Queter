@@ -1,5 +1,6 @@
 from django.contrib.auth.forms import AuthenticationForm
 from django import forms
+from django.core.exceptions import ValidationError
 
 
 class UserLoginForm(AuthenticationForm):
@@ -20,6 +21,20 @@ class UserRegisterForm(forms.Form):
 
     username = forms.CharField(max_length=255)
     email = forms.EmailField()
-    password1 = forms.CharField(max_length=255)
-    password2 = forms.CharField(max_length=255)
+    password1 = forms.CharField(
+        max_length=255,
+        label='Password',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
+    )
+    password2 = forms.CharField(
+        max_length=255,
+        label='Password confirmation',
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
+    )
 
+    def clean_password2(self):
+        password1 = self.cleaned_data.get('password1')
+        password2 = self.cleaned_data.get('password2')
+        if password1 and password2 and password1 != password2:
+            raise ValidationError('Passwords are not equal')
+        return password2
