@@ -24,11 +24,14 @@ class PostListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Post.objects.filter(owner__in=self.request.user.followers.all()).order_by("-create_date")
+        if self.request.path == '/':
+            return Post.objects.filter(owner__in=self.request.user.followers.all()).order_by("-create_date")
+        else:
+            return Post.objects.all().order_by("-create_date")
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
-        context['page_title'] = 'Home' if self.request.path == '/index/' else 'Explore'
+        context['page_title'] = 'Home' if self.request.path == '/' else 'Explore'
         return context
 
 
@@ -73,19 +76,20 @@ def follow_toggle(request):
         current_user = request.user
         user_id = json.loads(request.body).get('user_id')
 
-        if user_id in User.objects.all().id:
-            if user_id in current_user.followers.id.all():
-                current_user.followers.remove(User.objects.get(id=user_id))
-                return JsonResponse({'message': 'User unfollowed'}, status=201)
+        if not User.objects.filter(id=user_id).exists():
+            return JsonResponse({'error': 'User does not exist'}, status=404)
 
-            if user_id == current_user.id:
-                return JsonResponse({'error': 'You can not follow yourself'}, status=400)
+        user = User.objects.get(id=user_id)
+        if current_user == user:
+            return JsonResponse({'error': 'You can not follow yourself :)'}, status=400)
 
-            else:
-                current_user.followers.add(User.objects.get(id=user_id))
-                return JsonResponse({'message': 'User followed'}, status=201)
+        if current_user.followers.filter(id=user_id).exists():
+            current_user.followers.remove(user)
+            return JsonResponse({'message': 'User unfollowed'}, status=201)
+        else:
+            current_user.followers.add(user)
+            return JsonResponse({'message': 'User followed'}, status=201)
 
-        return JsonResponse({'error': 'User does not exist'}, status=400)
     return JsonResponse({'error': 'Method not allowed'}, status=400)
 
 
@@ -94,13 +98,16 @@ def like_toggle(request):
     if request.method == 'POST':
         post_id = json.loads(request.body).get('post_id')
         current_user = request.user
-        if post_id in Post.objects.all().id:
-            if current_user in Post.objects.get(id=post_id).likes:
-                Post.objects.get(id=post_id).likes.remove(current_user)
-                return JsonResponse({'message': 'Post like removed'}, status=201)
-            else:
-                Post.objects.get(id=post_id).likes.add(current_user)
-                return JsonResponse({'message': 'Post liked'}, status=201)
-        return JsonResponse({'error': 'Post does not exist'})
-    return JsonResponse({'error': 'Method not allowed'})
 
+        if not Post.objects.filter(id=post_id).exists():
+            return JsonResponse({'error': 'Post does not exist'}, status=404)
+
+        post = Post.objects.get(id=post_id)
+        if post.likes.filter(id=current_user.id).exists():
+            post.likes.remove(current_user)
+            return JsonResponse({'message': 'Post like removed'}, status=201)
+        else:
+            post.likes.add(current_user)
+            return JsonResponse({'message': 'Post liked'}, status=201)
+
+    return JsonResponse({'error': 'Method not allowed'}, status=400)
