@@ -24,10 +24,12 @@ class PostListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        pass
+        return Post.objects.filter(owner__in=self.request.user.followers.all()).order_by("-create_date")
 
     def get_context_data(self, *, object_list=None, **kwargs):
-        pass
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['page_title'] = 'Home' if self.request.path == '/index/' else 'Explore'
+        return context
 
 
 class ProfileView(LoginRequiredMixin, DetailView):
