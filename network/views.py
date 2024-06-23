@@ -91,4 +91,16 @@ def follow_toggle(request):
 
 @login_required
 def like_toggle(request):
-    pass
+    if request.method == 'POST':
+        post_id = json.loads(request.body).get('post_id')
+        current_user = request.user
+        if post_id in Post.objects.all().id:
+            if current_user in Post.objects.get(id=post_id).likes:
+                Post.objects.get(id=post_id).likes.remove(current_user)
+                return JsonResponse({'message': 'Post like removed'}, status=201)
+            else:
+                Post.objects.get(id=post_id).likes.add(current_user)
+                return JsonResponse({'message': 'Post liked'}, status=201)
+        return JsonResponse({'error': 'Post does not exist'})
+    return JsonResponse({'error': 'Method not allowed'})
+
