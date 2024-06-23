@@ -24,15 +24,13 @@ class UserRegisterForm(forms.Form):
             else:
                 field.widget.attr['class'] = 'form-control'
 
-    username = forms.CharField(max_length=255)
+    username = forms.CharField()
     email = forms.EmailField(required=True)
     password1 = forms.CharField(
-        max_length=255,
         label='Password',
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'}),
     )
     password2 = forms.CharField(
-        max_length=255,
         label='Password confirmation',
         widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
     )
