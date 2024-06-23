@@ -52,7 +52,13 @@ class ProfileView(LoginRequiredMixin, DetailView):
 
 @login_required
 def new_post(request):
-    pass
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        post_content = data.get('post_content')
+        if post_content:
+            post = Post.objects.create(text=post_content, owner=request.user)
+            return JsonResponse({'post_id': post.id}, status=200)
+        return JsonResponse({'error': 'post_content is required'}, status=400)
 
 
 @login_required
