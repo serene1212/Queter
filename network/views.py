@@ -59,6 +59,7 @@ def new_post(request):
             post = Post.objects.create(text=post_content, owner=request.user)
             return JsonResponse({'post_id': post.id}, status=200)
         return JsonResponse({'error': 'post_content is required'}, status=400)
+    return JsonResponse({'error': 'Method not allowed'}, status=400)
 
 
 @login_required
@@ -71,17 +72,22 @@ def follow_toggle(request):
     if request.method == 'POST':
         current_user = request.user
         user_id = json.loads(request.body).get('user_id')
+
         if user_id in User.objects.all().id:
             if user_id in current_user.followers.id.all():
                 current_user.followers.remove(User.objects.get(id=user_id))
                 return JsonResponse({'message': 'User unfollowed'}, status=200)
+
             if user_id == current_user.id:
                 return JsonResponse({'error': 'You can not follow yourself'}, status=400)
+
             else:
                 current_user.followers.add(User.objects.get(id=user_id))
                 return JsonResponse({'message': 'User followed'}, status=200)
+
         return JsonResponse({'error': 'User does not exist'}, status=400)
     return JsonResponse({'error': 'Method not allowed'}, status=400)
+
 
 @login_required
 def like_toggle(request):
