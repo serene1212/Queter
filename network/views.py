@@ -24,11 +24,14 @@ class PostListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        return Post.objects.filter(owner__in=self.request.user.followers.all()).order_by("-create_date")
+        if self.request.path == '/':
+            return Post.objects.filter(owner__in=self.request.user.followers.all()).order_by("-create_date")
+        else:
+            return Post.objects.all().order_by("-create_date")
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(object_list=object_list, **kwargs)
-        context['page_title'] = 'Home' if self.request.path == '/index/' else 'Explore'
+        context['page_title'] = 'Home' if self.request.path == '/' else 'Explore'
         return context
 
 
@@ -80,11 +83,11 @@ def follow_toggle(request):
         if current_user == user:
             return JsonResponse({'error': 'You can not follow yourself :)'}, status=400)
 
-        if user.has_follower(current_user):
-            user.followers.remove(current_user)
+        if current_user.followers.filter(id=user_id).exists():
+            current_user.followers.remove(user)
             return JsonResponse({'message': 'User unfollowed'}, status=201)
         else:
-            user.followers.add(current_user)
+            current_user.followers.add(user)
             return JsonResponse({'message': 'User followed'}, status=201)
 
     return JsonResponse({'error': 'Method not allowed'}, status=400)
