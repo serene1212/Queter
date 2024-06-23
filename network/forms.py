@@ -4,6 +4,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django import forms
 from django.core.exceptions import ValidationError
 
+from .models import User
+
 
 class UserLoginForm(AuthenticationForm):
     pass
@@ -13,6 +15,7 @@ class UserRegisterForm(forms.Form):
     """
         add form-control class to all fields
     """
+
     def __init__(self, *args, **kwargs):
         super(UserRegisterForm, self).__init__(*args, **kwargs)
         for field_name, field in self.fields.items():
@@ -47,3 +50,8 @@ class UserRegisterForm(forms.Form):
             raise ValidationError('Only Gmail addresses are allowed.')
         return email
 
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        if User.objects.filter(username=username).exists():
+            raise ValidationError('Username already exists.')
+        return username
