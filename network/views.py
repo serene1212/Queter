@@ -80,12 +80,13 @@ def follow_toggle(request):
         if current_user == user:
             return JsonResponse({'error': 'You can not follow yourself :)'}, status=400)
 
-        if user.followers.filter(id=current_user.id).exists():
+        if user.has_follower(current_user):
             user.followers.remove(current_user)
             return JsonResponse({'message': 'User unfollowed'}, status=201)
         else:
             user.followers.add(current_user)
             return JsonResponse({'message': 'User followed'}, status=201)
+
     return JsonResponse({'error': 'Method not allowed'}, status=400)
 
 
