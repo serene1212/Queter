@@ -9,6 +9,7 @@ QuillQuest is a minimalistic Twitter clone
 The idea behind this name is to evoke the imagery of a quill, which is a classic writing tool, symbolizing the act of writing and sharing thoughts. The word “Quest” suggests a journey or search, which in the context of your project, could represent the pursuit of concise and meaningful communication.
 
 Quill: Represents writing, expression, and the traditional roots of communication.
+
 Quest: Implies a continuous search for knowledge, interaction, and community engagement.
 
 ## Features
